@@ -47,7 +47,7 @@ export default async function LandingPage() {
         </h3>
         <div className="leading-relaxed max-w-3xl mx-auto text-lg space-y-4">
           <p>
-            Centre for Indian Knowledge and Values (CIKV) embodies the rich tapestry of India's cultural heritage, ethical traditions, and profound wisdom. Our initiative is a heartfelt endeavor to preserve, promote, and imbibe the timeless principles and teachings that have been passed down through generations.
+            Centre for Indian Knowledge and Values (CIKV) embodies the rich tapestry of India&apos;s cultural heritage, ethical traditions, and profound wisdom. Our initiative is a heartfelt endeavor to preserve, promote, and imbibe the timeless principles and teachings that have been passed down through generations.
           </p>
           <p>
             At its core, CIKV seeks to bridge the ancient with the modern, creating a platform where awareness about our ethics and values becomes a guiding light for individuals and communities alike.
