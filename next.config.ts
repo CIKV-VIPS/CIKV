@@ -5,6 +5,12 @@ const nextConfig: NextConfig = {
   turbopack: {},
   // New way to externalize packages
   serverExternalPackages: ['@libsql/client', '@prisma/adapter-libsql'],
+  experimental: {
+    outputFileTracingIncludes: {
+      '/api/**/*': ['./node_modules/.prisma/client/**/*'],
+      '/*': ['./node_modules/.prisma/client/**/*'],
+    },
+  },
   images: {
     remotePatterns: [
       {
