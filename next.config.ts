@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   // Minimal turbopack config to avoid Turbopack vs webpack conflict
   turbopack: {},
   // New way to externalize packages
-  serverExternalPackages: ['@libsql/client', '@prisma/adapter-libsql'],
+  serverExternalPackages: [],
   experimental: {
     outputFileTracingIncludes: {
       '/api/**/*': ['./node_modules/.prisma/client/**/*'],
