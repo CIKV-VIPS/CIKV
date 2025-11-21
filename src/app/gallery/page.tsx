@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 
 const PageBanner = ({ title, subtitle }: { title: string; subtitle?: string }) => {
   return (
@@ -31,7 +31,7 @@ const AlbumCard = ({ eventName, images }: { eventName: string; images: any[] }) 
 
   return (
     <Link href={`/gallery/${encodeURIComponent(eventName)}`} className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col transition-transform hover:scale-105 cursor-pointer">
-      <Image
+      <SafeImage
         src={coverImage || placeholder}
         alt={eventName}
         width={600}

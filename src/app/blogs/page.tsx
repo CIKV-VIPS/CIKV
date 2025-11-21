@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 
 const getPlaceholderImage = (title: string) => {
   return `https://placehold.co/600x400/6D2828/FFFBEB?text=${encodeURIComponent(title)}`;
@@ -41,7 +41,7 @@ const BlogCard = ({ blog }: { blog: any }) => {
 
   return (
     <div className="bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col transition-transform hover:scale-105">
-      <Image
+      <SafeImage
         src={imageUrl || getPlaceholderImage(title)}
         alt={title}
         width={600}

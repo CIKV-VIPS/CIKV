@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 import Link from 'next/link';
 import { HiArrowLeft, HiOutlineX } from 'react-icons/hi';
 
@@ -82,7 +82,7 @@ export default function AlbumDetailPage({ params }: AlbumPageProps) {
         {images.length > 0 ? (
           <div className="columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
             {images.map(image => (
-              <Image
+              <SafeImage
                 key={image.id}
                 src={image.imageUrl}
                 alt={image.eventName}
@@ -112,7 +112,7 @@ export default function AlbumDetailPage({ params }: AlbumPageProps) {
           >
             <HiOutlineX size={32} />
           </button>
-          <Image
+          <SafeImage
             src={selectedImage}
             alt="Full-size view"
             width={1200}

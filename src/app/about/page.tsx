@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 
 const ObjectiveCard = ({ title, description }: { title: string; description: string }) => {
   return (

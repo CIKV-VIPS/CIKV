@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 import { HiArrowLeft } from 'react-icons/hi';
 
 const getPlaceholderImage = (title: string) => {
@@ -50,7 +50,7 @@ const EventCard = ({ event }: { event: any }) => {
 
   return (
     <div className="bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden flex flex-col transition-transform hover:scale-105">
-      <Image
+      <SafeImage
         src={imageUrl || getPlaceholderImage(title)}
         alt={title}
         width={600}

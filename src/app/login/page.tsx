@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 import Cookies from 'js-cookie';
 
 const LoadingSpinner = () => {
@@ -51,7 +51,7 @@ export default function LoginPage() {
     <main className="bg-[#FFFBEB] min-h-screen flex items-center justify-center py-20 px-6">
       <div className="max-w-md w-full bg-white rounded-xl shadow-2xl p-8 lg:p-10">
         <div className="text-center">
-          <Image src="/assets/cikv_logo.jpeg" alt="CIKV Logo" width={80} height={80} className="mx-auto rounded-full" />
+          <SafeImage src="/assets/cikv_logo.jpeg" alt="CIKV Logo" width={80} height={80} className="mx-auto rounded-full" />
           <h1 className="text-3xl font-bold text-amber-900 mt-4 font-serif">
             Core Team Login
           </h1>

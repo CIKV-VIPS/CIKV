@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
 export default function Header() {
 
@@ -24,9 +24,10 @@ return (
 
 {/* Left: CIKV Logo + Name */}
 
-<Link href="/" className="flex items-center space-x-4 flex-shrink-0 ml-5" onClick={() => setMobileNavOpen(false)}>
 
-<Image src="/assets/cikv_logo.jpeg" alt="CIKV Logo" width={48} height={48} className="h-12 w-auto rounded-full" />
+	<Link href="/" className="flex items-center space-x-4 flex-shrink-0 ml-5" onClick={() => setMobileNavOpen(false)}>
+
+<SafeImage src="/assets/cikv_logo.jpeg" alt="CIKV Logo" width={48} height={48} className="h-12 w-auto rounded-full" />
 
 <h1 className="text-xl font-semibold text-amber-100 hidden sm:block">
 
@@ -64,7 +65,7 @@ Centre for Indian Knowledge and Values (CIKV)
 
 <a href="https://vips.edu/" target="_blank" rel="noreferrer">
 
-<Image src="/assets/vips_logo.png" alt="VIPS Logo" width={48} height={48} className="h-12 w-auto" />
+<SafeImage src="/assets/vips_logo.png" alt="VIPS Logo" width={48} height={48} className="h-12 w-auto" />
 
 </a>
 
@@ -116,9 +117,9 @@ aria-label="Toggle menu"
 
 <div className="px-6 py-4 border-t border-amber-500">
 
-<a href="https://vips.edu/" target="_blank" rel="noreferrer">
+			<a href="https://vips.edu/" target="_blank" rel="noreferrer">
 
-<Image src="/assets/vips_logo.png" alt="VIPS Logo" width={40} height={40} className="h-10 w-auto mx-auto" />
+<SafeImage src="/assets/vips_logo.png" alt="VIPS Logo" width={40} height={40} className="h-10 w-auto mx-auto" />
 
 </a>
 

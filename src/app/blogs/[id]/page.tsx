@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
 
@@ -59,7 +59,7 @@ export default async function BlogDetailPage({ params }: BlogPageProps) {
         </Link>
 
         <div className="bg-white rounded-lg shadow-xl overflow-hidden max-w-4xl mx-auto">
-          <Image
+          <SafeImage
             src={blog.imageUrl || getPlaceholderImage(blog.title)}
             alt={blog.title}
             width={1200}

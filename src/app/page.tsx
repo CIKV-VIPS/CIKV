@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Image from 'next/image';
+import SafeImage from '@/components/SafeImage';
 import prisma from '@/lib/prisma';
 
 async function getUpcomingEvents() {
@@ -23,6 +23,13 @@ async function getUpcomingEvents() {
 
 const getPlaceholderImage = (title: string) => {
   return `https://placehold.co/600x400/6D2828/FFFBEB?text=${encodeURIComponent(title)}`;
+};
+
+const isValidImageSrc = (src?: string | null) => {
+  if (!src || typeof src !== 'string') return false;
+  const trimmed = src.trim();
+  // allow absolute http(s), data URLs and root-relative paths
+  return /^https?:\/\//i.test(trimmed) || /^data:/i.test(trimmed) || trimmed.startsWith('/');
 };
 
 export default async function LandingPage() {
@@ -63,8 +70,8 @@ export default async function LandingPage() {
             {upcomingEvents.length > 0 ? (
               upcomingEvents.map(event => (
                 <div key={event.id} className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
-                  <Image
-                    src={event.imageUrl || getPlaceholderImage(event.title)}
+                    <SafeImage
+                    src={isValidImageSrc(event.imageUrl) ? (event.imageUrl as string) : getPlaceholderImage(event.title)}
                     alt={event.title}
                     width={600}
                     height={400}
