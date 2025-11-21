@@ -45,7 +45,7 @@ export default function DashboardLayout({
           <span className="text-sm text-amber-200">Admin Dashboard</span>
         </div>
         
-        <ul className="flex-grow space-y-2 px-4">
+        <ul className="flex-grow space-y-2 px-4 overflow-y-auto">
           <Link href="/dashboard/events">
             <SidebarButton
               icon={<HiCalendar size={20} />}
