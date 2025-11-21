@@ -1,29 +1,15 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaLibSql } from '@prisma/adapter-libsql'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
 
 const globalForPrisma = global as unknown as { prisma?: PrismaClient }
 
-const dbUrl = process.env.DATABASE_URL || undefined
-let adapter: any | undefined
-// Only initialize the LibSQL adapter when the DATABASE_URL indicates a libsql/sqlite
-// connection. The Prisma schema may specify a different provider (e.g. postgresql),
-// so avoid creating an incompatible adapter for those cases.
-if (dbUrl) {
-  const normalized = dbUrl.toLowerCase();
-  const looksLikeLibSql = normalized.startsWith('file:') || normalized.startsWith('libsql:') || normalized.includes('sqlite');
-  if (looksLikeLibSql) {
-    try {
-      adapter = new PrismaLibSql({ url: dbUrl })
-    } catch (e) {
-      console.error('Failed to create PrismaLibSql adapter:', e)
-    }
-  }
-}
+const dbUrl = process.env.DATABASE_URL
+let adapter
 
-// If no engine type is specified, prefer the binary engine in Node environments so
-// Prisma doesn't require an adapter for the "client" engine type.
-if (!process.env.PRISMA_CLIENT_ENGINE_TYPE) {
-  process.env.PRISMA_CLIENT_ENGINE_TYPE = 'binary'
+if (dbUrl && dbUrl.startsWith('postgres')) {
+  const pool = new Pool({ connectionString: dbUrl })
+  adapter = new PrismaPg(pool)
 }
 
 const prisma =
