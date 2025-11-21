@@ -18,5 +18,7 @@ export default function SafeImage(props: ImageProps) {
 
   const safeSrc = isValidImageSrc(srcStr) ? srcStr : getPlaceholderImage(typeof alt === 'string' ? alt : undefined);
 
-  return <Image src={safeSrc} alt={alt as string} {...(rest as ImageProps)} />;
+  // Ensure we don't re-spread `src` or `alt` into the Image component —
+  // cast `rest` to omit them so TypeScript doesn't consider `src` duplicated.
+  return <Image src={safeSrc} alt={alt as string} {...(rest as Omit<ImageProps, 'src' | 'alt'>)} />;
 }
