@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import bcrypt from 'bcrypt';
 import { SignJWT } from 'jose';
+import prisma from '@/lib/prisma';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'your-default-secret');
 
