@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  userId        String   @unique
+  passwordHash  String
+  createdAt     DateTime @default(now())
+}
+
+model Blog {
+  id        Int      @id @default(autoincrement())
+  title     String
+  author    String
+  content   String
+  imageUrl  String?
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  date        DateTime
+  category    String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+}
+
+model Form {
+  id              Int    @id @default(autoincrement())
+  title           String
+  googleFormLink  String
+  status          String @default("inactive")
+}
+
+model GalleryImage {
+  id         Int      @id @default(autoincrement())
+  eventName  String
+  imageUrl   String
+  uploadedAt DateTime @default(now())
+}

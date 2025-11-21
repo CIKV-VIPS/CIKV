@@ -1,0 +1,38 @@
+# Python bytecode
+*.pyc
+__pycache__/
+
+# Virtual environment
+.venv/
+venv/
+env/
+Backend/venv
+Backend/venv/lib/python3.12/site-packages/click/__init__.py
+Backend/venv/lib/python3.12/site-packages/click/_compat.py
+
+# Instance folder (contains configuration and database)
+instance/
+
+# Test-related files
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Editor-specific files (example for VS Code)
+.vscode/
+
+# Database files (if using SQLite)
+*.sqlite3
+*.db
+
+# Log files
+*.log
+
+# Environment variables (if used)
+.env
+Backend/.env

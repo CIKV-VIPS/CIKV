@@ -1,65 +1,101 @@
-import Image from "next/image";
+import Link from 'next/link';
+import Image from 'next/image';
+import prisma from '@/lib/prisma';
 
-export default function Home() {
+async function getUpcomingEvents() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const events = await prisma.event.findMany({
+    where: {
+      date: {
+        gte: today,
+      },
+    },
+    orderBy: {
+      date: 'asc',
+    },
+    take: 3,
+  });
+
+  return events;
+}
+
+const getPlaceholderImage = (title: string) => {
+  return `https://placehold.co/600x400/6D2828/FFFBEB?text=${encodeURIComponent(title)}`;
+};
+
+export default async function LandingPage() {
+  const upcomingEvents = await getUpcomingEvents();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="bg-[#FFFBEB]">
+      <section className="relative bg-cover bg-center h-[100vh] md:h-[76vh]" style={{ backgroundImage: `url(/assets/cikv_landing_banner.png)` }}>
+        <div className="absolute inset-0 bg-black opacity-30"></div>
+      </section>
+
+      <section className="container mx-auto px-6 py-16 text-gray-700 text-center">
+        <h3 className="text-4xl font-semibold mb-6 text-gray-800">
+          Welcome to CIKV
+        </h3>
+        <div className="leading-relaxed max-w-3xl mx-auto text-lg space-y-4">
+          <p>
+            Centre for Indian Knowledge and Values (CIKV) embodies the rich tapestry of India's cultural heritage, ethical traditions, and profound wisdom. Our initiative is a heartfelt endeavor to preserve, promote, and imbibe the timeless principles and teachings that have been passed down through generations.
+          </p>
+          <p>
+            At its core, CIKV seeks to bridge the ancient with the modern, creating a platform where awareness about our ethics and values becomes a guiding light for individuals and communities alike.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <Link 
+          href="/about"
+          className="inline-block mt-8 text-lg font-semibold text-amber-800 hover:text-amber-600 border-b-2 border-amber-800 hover:border-amber-600 transition-colors"
+        >
+          Read More About Our Mission
+        </Link>
+      </section>
+
+      <section className="bg-[#6D2828] py-16">
+        <div className="container mx-auto px-6">
+          <h3 className="text-4xl font-semibold mb-10 text-center text-white">
+            Upcoming Events
+          </h3>
+          <div className="grid gap-8 md:grid-cols-3">
+            {upcomingEvents.length > 0 ? (
+              upcomingEvents.map(event => (
+                <div key={event.id} className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
+                  <Image
+                    src={event.imageUrl || getPlaceholderImage(event.title)}
+                    alt={event.title}
+                    width={600}
+                    height={400}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-6 flex flex-col flex-grow">
+                    <h4 className="text-2xl font-semibold mb-2 text-gray-800">{event.title}</h4>
+                    <p className="text-gray-600 mb-4 flex-grow">{event.description.substring(0, 100)}...</p>
+                    <Link 
+                      href="/events" 
+                      className="inline-block bg-yellow-500 text-white px-5 py-2 rounded-md shadow-md hover:bg-yellow-600 text-center font-semibold w-max"
+                    >
+                      Read More
+                    </Link>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="text-amber-100 text-lg text-center md:col-span-3">
+                No upcoming events scheduled. Please check back soon!
+              </p>
+            )}
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      <footer className="bg-yellow-100 border-t border-yellow-300 py-6">
+        <div className="container mx-auto px-6 text-center text-yellow-800">
+          <p className="font-semibold text-lg">Join our growing community</p>
+        </div>
+      </footer>
+    </main>
   );
 }
