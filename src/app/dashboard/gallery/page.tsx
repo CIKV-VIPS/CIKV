@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { HiPlus, HiTrash, HiX } from 'react-icons/hi';
+import SafeImage from '@/components/SafeImage';
 
 const LoadingSpinner = () => (
   <div className="w-6 h-6 border-2 border-amber-800 border-t-transparent rounded-full animate-spin"></div>
@@ -130,7 +131,7 @@ export default function GalleryPanel() {
         ) : (
           images.map(image => (
             <div key={image.id} className="relative rounded-lg shadow-md overflow-hidden group">
-              <img src={image.imageUrl} alt={image.eventName} className="w-full h-40 object-cover" />
+              <SafeImage src={image.imageUrl} alt={image.eventName} width={400} height={400} className="w-full h-40 object-cover" />
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-opacity flex flex-col justify-between p-2">
                 <button 
                   onClick={() => handleDelete(image.id)} 
