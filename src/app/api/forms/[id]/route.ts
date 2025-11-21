@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-
+import { revalidatePath } from 'next/cache';
 
 // GET a single form by ID
 export async function GET(request: NextRequest, context: any) {
@@ -36,6 +36,8 @@ export async function PUT(request: NextRequest, context: any) {
       },
     });
 
+    revalidatePath('/forms');
+
     return NextResponse.json({ message: 'Form updated successfully', form });
   } catch (error) {
     console.error(`Error updating form ${id}:`, error);
@@ -50,6 +52,8 @@ export async function DELETE(request: NextRequest, context: any) {
     await prisma.form.delete({
       where: { id: parseInt(id, 10) },
     });
+
+    revalidatePath('/forms');
 
     return NextResponse.json({ message: 'Form deleted successfully' }, { status: 200 });
   } catch (error) {

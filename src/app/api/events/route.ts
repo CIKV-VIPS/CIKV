@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-
+import { revalidatePath } from 'next/cache';
 
 // GET all events
 export async function GET() {
@@ -35,6 +35,8 @@ export async function POST(request: Request) {
         imageUrl,
       },
     });
+
+    revalidatePath('/events');
 
     return NextResponse.json({ message: 'Event created successfully', event }, { status: 201 });
   } catch (error) {

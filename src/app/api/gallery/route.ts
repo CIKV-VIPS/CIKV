@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { revalidatePath } from 'next/cache';
 
 // GET all gallery images
 export async function GET() {
@@ -31,6 +32,8 @@ export async function POST(request: Request) {
         imageUrl,
       },
     });
+
+    revalidatePath('/gallery');
 
     return NextResponse.json({ message: 'Image added successfully', image }, { status: 201 });
   } catch (error) {

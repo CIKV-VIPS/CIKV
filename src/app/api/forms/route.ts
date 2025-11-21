@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-
+import { revalidatePath } from 'next/cache';
 
 // GET all forms
 export async function GET() {
@@ -29,6 +29,8 @@ export async function POST(request: Request) {
         status,
       },
     });
+
+    revalidatePath('/forms');
 
     return NextResponse.json({ message: 'Form created successfully', form }, { status: 201 });
   } catch (error) {

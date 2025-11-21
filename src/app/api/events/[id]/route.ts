@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-
+import { revalidatePath } from 'next/cache';
 
 // GET a single event by ID
 export async function GET(request: NextRequest, context: any) {
@@ -38,6 +38,9 @@ export async function PUT(request: NextRequest, context: any) {
       },
     });
 
+    revalidatePath('/events');
+    revalidatePath(`/events/${id}`);
+
     return NextResponse.json({ message: 'Event updated successfully', event });
   } catch (error) {
     console.error(`Error updating event ${id}:`, error);
@@ -52,6 +55,9 @@ export async function DELETE(request: NextRequest, context: any) {
     await prisma.event.delete({
       where: { id: parseInt(id, 10) },
     });
+
+    revalidatePath('/events');
+    revalidatePath(`/events/${id}`);
 
     return NextResponse.json({ message: 'Event deleted successfully' }, { status: 200 });
   } catch (error) {

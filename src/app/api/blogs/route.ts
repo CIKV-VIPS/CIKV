@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-
+import { revalidatePath } from 'next/cache';
 
 // GET all blogs
 export async function GET() {
@@ -34,6 +34,8 @@ export async function POST(request: Request) {
         imageUrl,
       },
     });
+
+    revalidatePath('/blogs');
 
     return NextResponse.json({ message: 'Blog created successfully', blog }, { status: 201 });
   } catch (error) {

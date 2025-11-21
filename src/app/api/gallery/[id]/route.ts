@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-
+import { revalidatePath } from 'next/cache';
 
 // UPDATE a gallery image by ID
 export async function PUT(request: NextRequest, context: any) {
@@ -16,6 +16,11 @@ export async function PUT(request: NextRequest, context: any) {
       },
     });
 
+    revalidatePath('/gallery');
+    if (eventName) {
+      revalidatePath(`/gallery/${eventName}`);
+    }
+
     return NextResponse.json({ message: 'Image updated successfully', image });
   } catch (error) {
     console.error(`Error updating gallery image ${id}:`, error);
@@ -27,9 +32,18 @@ export async function PUT(request: NextRequest, context: any) {
 export async function DELETE(request: NextRequest, context: any) {
   const { id } = context.params;
   try {
+    const image = await prisma.galleryImage.findUnique({
+        where: { id: parseInt(id, 10) },
+    });
+
     await prisma.galleryImage.delete({
       where: { id: parseInt(id, 10) },
     });
+
+    revalidatePath('/gallery');
+    if (image && image.eventName) {
+        revalidatePath(`/gallery/${image.eventName}`);
+    }
 
     return NextResponse.json({ message: 'Image deleted successfully' }, { status: 200 });
   } catch (error) {
