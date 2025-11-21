@@ -39,7 +39,7 @@ export default function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-[#FFFBEB]">
-      <nav className="w-64 bg-[#6D2828] text-amber-100 flex flex-col shadow-lg">
+      <nav className="w-64 bg-[#6D2828] text-amber-100 flex flex-col shadow-lg h-screen sticky top-0">
         <div className="p-6 text-center">
           <h1 className="text-3xl font-bold text-white font-serif">CIKV</h1>
           <span className="text-sm text-amber-200">Admin Dashboard</span>
