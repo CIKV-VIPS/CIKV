@@ -3,12 +3,36 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
 import prisma from '@/lib/prisma';
 
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}
+
 export async function POST(request: Request) {
   try {
-    const { userId, password } = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      return NextResponse.json(
+        { message: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+
+    const { userId, password } = body;
 
     if (!userId || !password) {
-      return NextResponse.json({ message: 'User ID and password are required' }, { status: 400 });
+      return NextResponse.json(
+        { message: 'User ID and password are required' },
+        { status: 400 }
+      );
     }
 
     const existingUser = await prisma.user.findUnique({
@@ -16,7 +40,10 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
-      return NextResponse.json({ message: 'User ID already exists' }, { status: 409 });
+      return NextResponse.json(
+        { message: 'User ID already exists' },
+        { status: 409 }
+      );
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -28,9 +55,15 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ message: 'Registration successful', user }, { status: 201 });
+    return NextResponse.json(
+      { message: 'Registration successful', user },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Registration error:', error);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Internal server error', error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
   }
 }

@@ -6,12 +6,36 @@ import prisma from '@/lib/prisma';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'your-default-secret');
 
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    },
+  });
+}
+
 export async function POST(request: Request) {
   try {
-    const { userId, password } = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      return NextResponse.json(
+        { message: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+
+    const { userId, password } = body;
 
     if (!userId || !password) {
-      return NextResponse.json({ message: 'User ID and password are required' }, { status: 400 });
+      return NextResponse.json(
+        { message: 'User ID and password are required' },
+        { status: 400 }
+      );
     }
 
     const user = await prisma.user.findUnique({
@@ -19,13 +43,19 @@ export async function POST(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
+      return NextResponse.json(
+        { message: 'Invalid credentials' },
+        { status: 401 }
+      );
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
     if (!isPasswordValid) {
-      return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
+      return NextResponse.json(
+        { message: 'Invalid credentials' },
+        { status: 401 }
+      );
     }
 
     const token = await new SignJWT({ userId: user.userId })
@@ -34,9 +64,15 @@ export async function POST(request: Request) {
       .setExpirationTime('1h')
       .sign(JWT_SECRET);
 
-    return NextResponse.json({ message: 'Login successful', accessToken: token, user });
+    return NextResponse.json(
+      { message: 'Login successful', accessToken: token, user },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Login error:', error);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Internal server error', error: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
   }
 }

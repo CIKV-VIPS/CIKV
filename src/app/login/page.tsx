@@ -31,17 +31,34 @@ export default function LoginPage() {
         body: JSON.stringify({ userId, password }),
       });
 
-      const data = await res.json();
+      // Check if response has content before parsing JSON
+      const contentType = res.headers.get('content-type');
+      let data;
+      
+      if (contentType && contentType.includes('application/json')) {
+        const text = await res.text();
+        if (text) {
+          try {
+            data = JSON.parse(text);
+          } catch (parseError) {
+            throw new Error(`Server error: ${res.status} ${res.statusText}`);
+          }
+        } else {
+          throw new Error(`Server error: ${res.status} ${res.statusText}`);
+        }
+      } else {
+        throw new Error(`Server error: ${res.status} ${res.statusText}`);
+      }
 
       if (!res.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data?.message || `Login failed: ${res.status} ${res.statusText}`);
       }
       
       Cookies.set('accessToken', data.accessToken, { expires: 1/24 }); // Expires in 1 hour
       router.push('/dashboard'); 
 
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

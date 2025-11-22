@@ -32,10 +32,27 @@ export default function RegisterPage() {
         body: JSON.stringify({ userId, password }),
       });
 
-      const data = await res.json();
+      // Check if response has content before parsing JSON
+      const contentType = res.headers.get('content-type');
+      let data;
+      
+      if (contentType && contentType.includes('application/json')) {
+        const text = await res.text();
+        if (text) {
+          try {
+            data = JSON.parse(text);
+          } catch (parseError) {
+            throw new Error(`Server error: ${res.status} ${res.statusText}`);
+          }
+        } else {
+          throw new Error(`Server error: ${res.status} ${res.statusText}`);
+        }
+      } else {
+        throw new Error(`Server error: ${res.status} ${res.statusText}`);
+      }
 
       if (!res.ok) {
-        throw new Error(data.message || 'Registration failed');
+        throw new Error(data?.message || `Registration failed: ${res.status} ${res.statusText}`);
       }
       
       setSuccess(true);
@@ -44,7 +61,7 @@ export default function RegisterPage() {
       }, 2000);
 
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
