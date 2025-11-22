@@ -4,8 +4,14 @@ import { jwtVerify } from 'jose';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'your-default-secret');
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Allow auth routes to pass through
+  if (pathname.startsWith('/api/auth')) {
+    return NextResponse.next();
+  }
+
   const token = request.cookies.get('accessToken')?.value || request.headers.get('Authorization')?.split(' ')[1];
 
   if (pathname.startsWith('/dashboard')) {
