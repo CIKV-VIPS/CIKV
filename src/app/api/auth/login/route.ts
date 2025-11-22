@@ -6,22 +6,6 @@ import prisma from '@/lib/prisma';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'your-default-secret');
 
-// Force dynamic rendering for this route
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
-export const fetchCache = 'force-no-store';
-
-export async function OPTIONS() {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    },
-  });
-}
-
 export async function POST(request: Request) {
   try {
     let body;
