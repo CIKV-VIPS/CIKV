@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 import prisma from '@/lib/prisma';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'your-default-secret');
+
+// Ensure this route is treated as dynamic
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
