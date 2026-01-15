@@ -85,6 +85,10 @@ export async function DELETE(
   const id = parseInt(params.id, 10);
 
   if (isNaN(id)) {
+    return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+  }
+
+  try {
     if (!process.env.DATABASE_URL) {
       return NextResponse.json({ message: 'Database not configured' }, { status: 503 });
     }
@@ -106,10 +110,6 @@ export async function DELETE(
     }
   } catch (error) {
     console.error(`Error deleting blog ${id}:`, error);
-    return NextResponse.json({ message: "Internal server error" }, { status: 500 }  error instanceof Error ? error.message : "An unknown error occurred";
-    return NextResponse.json(
-      { message: "Internal server error", error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
