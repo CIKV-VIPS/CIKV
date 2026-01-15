@@ -5,20 +5,20 @@ import { revalidatePath } from 'next/cache';
 // GET all forms
 export async function GET() {
   try {
-    // Check if DATABASE_URL is set
     if (!process.env.DATABASE_URL) {
       console.error('DATABASE_URL not configured');
-      return NextResponse.json(
-        { message: 'Database not configured', forms: [] },
-        { status: 200 } // Return 200 with empty array instead of 500
-      );
+      return NextResponse.json([], { status: 200 });
     }
 
-    const forms = await prisma.form.findMany();
-    return NextResponse.json(forms);
+    try {
+      const forms = await prisma.form.findMany();
+      return NextResponse.json(forms || [], { status: 200 });
+    } catch (dbError) {
+      console.error('Database error fetching forms:', dbError);
+      return NextResponse.json([], { status: 200 });
+    }
   } catch (error) {
-    console.error('Error fetching forms:', error);
-    // Return empty array instead of 500 error
+    console.error('Error in forms GET:', error);
     return NextResponse.json([], { status: 200 });
   }
 }
@@ -42,24 +42,32 @@ export async function POST(request: Request) {
       );
     }
 
-    const form = await prisma.form.create({
-      data: {
-        title,
-        googleFormLink,
-        status,
-      },
-    });
+    try {
+      const form = await prisma.form.create({
+        data: {
+          title,
+          googleFormLink,
+          status,
+        },
+      });
 
-    revalidatePath('/forms');
+      revalidatePath('/forms');
 
-    return NextResponse.json(
-      { message: 'Form created successfully', form },
-      { status: 201 }
-    );
+      return NextResponse.json(
+        { message: 'Form created successfully', form },
+        { status: 201 }
+      );
+    } catch (dbError) {
+      console.error('Database error creating form:', dbError);
+      return NextResponse.json(
+        { message: 'Failed to create form' },
+        { status: 400 }
+      );
+    }
   } catch (error) {
     console.error('Error creating form:', error);
     return NextResponse.json(
-      { message: 'Internal server error', error: error instanceof Error ? error.message : String(error) },
+      { message: 'Internal server error' },
       { status: 500 }
     );
   }

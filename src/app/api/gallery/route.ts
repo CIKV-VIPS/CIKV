@@ -10,14 +10,19 @@ export async function GET() {
       return NextResponse.json([], { status: 200 });
     }
 
-    const images = await prisma.galleryImage.findMany({
-      orderBy: {
-        uploadedAt: 'desc',
-      },
-    });
-    return NextResponse.json(images);
+    try {
+      const images = await prisma.galleryImage.findMany({
+        orderBy: {
+          uploadedAt: 'desc',
+        },
+      });
+      return NextResponse.json(images || [], { status: 200 });
+    } catch (dbError) {
+      console.error('Database error fetching gallery:', dbError);
+      return NextResponse.json([], { status: 200 });
+    }
   } catch (error) {
-    console.error('Error fetching gallery images:', error);
+    console.error('Error in gallery GET:', error);
     return NextResponse.json([], { status: 200 });
   }
 }
@@ -25,22 +30,31 @@ export async function GET() {
 // CREATE a new gallery image
 export async function POST(request: Request) {
   try {
-    const { eventName, imageUrl } = await request.json();
-
-    if (!eventName || !imageUrl) {
-      return NextResponse.json({ message: 'Event name and image URL are required' }, { status: 400 });
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json({ message: 'Database not configured' }, { status: 503 });
     }
 
-    const image = await prisma.galleryImage.create({
-      data: {
-        eventName,
-        imageUrl,
-      },
-    });
+    try {
+      const { eventName, imageUrl } = await request.json();
 
-    revalidatePath('/gallery');
+      if (!eventName || !imageUrl) {
+        return NextResponse.json({ message: 'Event name and image URL are required' }, { status: 400 });
+      }
 
-    return NextResponse.json({ message: 'Image added successfully', image }, { status: 201 });
+      const image = await prisma.galleryImage.create({
+        data: {
+          eventName,
+          imageUrl,
+        },
+      });
+
+      revalidatePath('/gallery');
+
+      return NextResponse.json({ message: 'Image added successfully', image }, { status: 201 });
+    } catch (dbError) {
+      console.error('Database error creating gallery image:', dbError);
+      return NextResponse.json({ message: 'Failed to add image' }, { status: 400 });
+    }
   } catch (error) {
     console.error('Error creating gallery image:', error);
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });

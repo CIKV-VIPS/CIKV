@@ -10,14 +10,19 @@ export async function GET() {
       return NextResponse.json([], { status: 200 });
     }
 
-    const blogs = await prisma.blog.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-    return NextResponse.json(blogs);
+    try {
+      const blogs = await prisma.blog.findMany({
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+      return NextResponse.json(blogs || [], { status: 200 });
+    } catch (dbError) {
+      console.error('Database error fetching blogs:', dbError);
+      return NextResponse.json([], { status: 200 });
+    }
   } catch (error) {
-    console.error('Error fetching blogs:', error);
+    console.error('Error in blogs GET:', error);
     return NextResponse.json([], { status: 200 });
   }
 }
@@ -25,24 +30,33 @@ export async function GET() {
 // CREATE a new blog
 export async function POST(request: Request) {
   try {
-    const { title, author, content, imageUrl } = await request.json();
-
-    if (!title || !author || !content) {
-      return NextResponse.json({ message: 'Title, author, and content are required' }, { status: 400 });
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json({ message: 'Database not configured' }, { status: 503 });
     }
 
-    const blog = await prisma.blog.create({
-      data: {
-        title,
-        author,
-        content,
-        imageUrl,
-      },
-    });
+    try {
+      const { title, author, content, imageUrl } = await request.json();
 
-    revalidatePath('/blogs');
+      if (!title || !author || !content) {
+        return NextResponse.json({ message: 'Title, author, and content are required' }, { status: 400 });
+      }
 
-    return NextResponse.json({ message: 'Blog created successfully', blog }, { status: 201 });
+      const blog = await prisma.blog.create({
+        data: {
+          title,
+          author,
+          content,
+          imageUrl,
+        },
+      });
+
+      revalidatePath('/blogs');
+
+      return NextResponse.json({ message: 'Blog created successfully', blog }, { status: 201 });
+    } catch (dbError) {
+      console.error('Database error creating blog:', dbError);
+      return NextResponse.json({ message: 'Failed to create blog' }, { status: 400 });
+    }
   } catch (error) {
     console.error('Error creating blog:', error);
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });

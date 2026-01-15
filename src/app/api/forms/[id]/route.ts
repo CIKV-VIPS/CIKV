@@ -25,23 +25,44 @@ export async function GET(request: NextRequest, context: any) {
 export async function PUT(request: NextRequest, context: any) {
   const { id } = context.params;
   try {
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json(
+        { message: 'Database not configured' },
+        { status: 503 }
+      );
+    }
+
     const { title, googleFormLink, status } = await request.json();
 
-    const form = await prisma.form.update({
-      where: { id: parseInt(id, 10) },
-      data: {
-        title,
-        googleFormLink,
-        status,
-      },
-    });
+    try {
+      const form = await prisma.form.update({
+        where: { id: parseInt(id, 10) },
+        data: {
+          title,
+          googleFormLink,
+          status,
+        },
+      });
 
-    revalidatePath('/forms');
+      revalidatePath('/forms');
 
-    return NextResponse.json({ message: 'Form updated successfully', form });
+      return NextResponse.json(
+        { message: 'Form updated successfully', form },
+        { status: 200 }
+      );
+    } catch (dbError) {
+      console.error(`Database error updating form ${id}:`, dbError);
+      return NextResponse.json(
+        { message: 'Failed to update form' },
+        { status: 400 }
+      );
+    }
   } catch (error) {
     console.error(`Error updating form ${id}:`, error);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
 
@@ -49,15 +70,36 @@ export async function PUT(request: NextRequest, context: any) {
 export async function DELETE(request: NextRequest, context: any) {
   const { id } = context.params;
   try {
-    await prisma.form.delete({
-      where: { id: parseInt(id, 10) },
-    });
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json(
+        { message: 'Database not configured' },
+        { status: 503 }
+      );
+    }
 
-    revalidatePath('/forms');
+    try {
+      await prisma.form.delete({
+        where: { id: parseInt(id, 10) },
+      });
 
-    return NextResponse.json({ message: 'Form deleted successfully' }, { status: 200 });
+      revalidatePath('/forms');
+
+      return NextResponse.json(
+        { message: 'Form deleted successfully' },
+        { status: 200 }
+      );
+    } catch (dbError) {
+      console.error(`Database error deleting form ${id}:`, dbError);
+      return NextResponse.json(
+        { message: 'Failed to delete form' },
+        { status: 400 }
+      );
+    }
   } catch (error) {
     console.error(`Error deleting form ${id}:`, error);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

@@ -112,20 +112,36 @@ export default function BlogPanel() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(currentBlog),
     })
+    .then(res => {
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      return res.json();
+    })
     .then(() => {
       setShowForm(false);
+      setError(null);
       fetchBlogs();
     })
-    .catch(err => setError(err.message));
+    .catch(err => {
+      console.error('Error:', err);
+      setError(err.message || 'Failed to save blog');
+    });
   };
 
   const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this blog post?')) {
       fetch(`/api/blogs/${id}`, { method: 'DELETE' })
+        .then(res => {
+          if (!res.ok) throw new Error(`API error: ${res.status}`);
+          return res.json();
+        })
         .then(() => {
+          setError(null);
           fetchBlogs();
         })
-        .catch(err => setError(err.message));
+        .catch(err => {
+          console.error('Error:', err);
+          setError(err.message || 'Failed to delete blog');
+        });
     }
   };
 

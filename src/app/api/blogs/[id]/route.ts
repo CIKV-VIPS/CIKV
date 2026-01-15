@@ -46,30 +46,34 @@ export async function PUT(
   }
 
   try {
-    const { title, author, content, imageUrl } = await request.json();
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json({ message: 'Database not configured' }, { status: 503 });
+    }
 
-    const blog = await prisma.blog.update({
-      where: { id },
-      data: {
-        title,
-        author,
-        content,
-        imageUrl,
-      },
-    });
+    try {
+      const { title, author, content, imageUrl } = await request.json();
 
-    revalidatePath("/blogs");
-    revalidatePath(`/blogs/${id}`);
+      const blog = await prisma.blog.update({
+        where: { id },
+        data: {
+          title,
+          author,
+          content,
+          imageUrl,
+        },
+      });
 
-    return NextResponse.json({ message: "Blog updated successfully", blog });
+      revalidatePath("/blogs");
+      revalidatePath(`/blogs/${id}`);
+
+      return NextResponse.json({ message: "Blog updated successfully", blog }, { status: 200 });
+    } catch (dbError) {
+      console.error(`Database error updating blog ${id}:`, dbError);
+      return NextResponse.json({ message: "Failed to update blog" }, { status: 400 });
+    }
   } catch (error) {
     console.error(`Error updating blog ${id}:`, error);
-    const errorMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    return NextResponse.json(
-      { message: "Internal server error", error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -81,24 +85,28 @@ export async function DELETE(
   const id = parseInt(params.id, 10);
 
   if (isNaN(id)) {
-    return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
-  }
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json({ message: 'Database not configured' }, { status: 503 });
+    }
 
-  try {
-    await prisma.blog.delete({
-      where: { id },
-    });
+    try {
+      await prisma.blog.delete({
+        where: { id },
+      });
 
-    revalidatePath("/blogs");
+      revalidatePath("/blogs");
 
-    return NextResponse.json(
-      { message: "Blog deleted successfully" },
-      { status: 200 }
-    );
+      return NextResponse.json(
+        { message: "Blog deleted successfully" },
+        { status: 200 }
+      );
+    } catch (dbError) {
+      console.error(`Database error deleting blog ${id}:`, dbError);
+      return NextResponse.json({ message: "Failed to delete blog" }, { status: 400 });
+    }
   } catch (error) {
     console.error(`Error deleting blog ${id}:`, error);
-    const errorMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
+    return NextResponse.json({ message: "Internal server error" }, { status: 500 }  error instanceof Error ? error.message : "An unknown error occurred";
     return NextResponse.json(
       { message: "Internal server error", error: errorMessage },
       { status: 500 }

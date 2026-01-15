@@ -81,20 +81,36 @@ export default function GalleryPanel() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(currentImage),
     })
+    .then(res => {
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      return res.json();
+    })
     .then(() => {
       setShowForm(false);
+      setError(null);
       fetchImages();
     })
-    .catch(err => setError(err.message));
+    .catch(err => {
+      console.error('Error:', err);
+      setError(err.message || 'Failed to add image');
+    });
   };
 
   const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this image?')) {
       fetch(`/api/gallery/${id}`, { method: 'DELETE' })
+        .then(res => {
+          if (!res.ok) throw new Error(`API error: ${res.status}`);
+          return res.json();
+        })
         .then(() => {
+          setError(null);
           fetchImages();
         })
-        .catch(err => setError(err.message));
+        .catch(err => {
+          console.error('Error:', err);
+          setError(err.message || 'Failed to delete image');
+        });
     }
   };
 

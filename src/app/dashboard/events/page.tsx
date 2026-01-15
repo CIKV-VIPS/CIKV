@@ -121,20 +121,38 @@ export default function EventPanel() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(currentEvent),
     })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`API error: ${res.status}`);
+      }
+      return res.json();
+    })
     .then(() => {
       setShowForm(false);
       fetchEvents();
     })
-    .catch(err => setError(err.message));
+    .catch(err => {
+      console.error('Submit error:', err);
+      setError(err.message || 'Failed to save event');
+    });
   };
 
   const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this event?')) {
       fetch(`/api/events/${id}`, { method: 'DELETE' })
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`API error: ${res.status}`);
+          }
+          return res.json();
+        })
         .then(() => {
           fetchEvents();
         })
-        .catch(err => setError(err.message));
+        .catch(err => {
+          console.error('Delete error:', err);
+          setError(err.message || 'Failed to delete event');
+        });
     }
   };
 
