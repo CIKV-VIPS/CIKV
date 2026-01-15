@@ -69,7 +69,7 @@ export async function safeGetBlogById(id: string) {
     }
 
     const blog = await prisma.blog.findUnique({
-      where: { id },
+      where: { id: parseInt(id, 10) },
     });
 
     return blog || null;
@@ -112,7 +112,7 @@ export async function safeGetEventById(id: string) {
     }
 
     const event = await prisma.event.findUnique({
-      where: { id },
+      where: { id: parseInt(id, 10) },
     });
 
     return event || null;
