@@ -55,12 +55,15 @@ const AlbumCard = ({ eventName, images }: { eventName: string; images: any[] }) 
 async function getAlbums() {
   const images = await safeGetAllGalleries();
 
-  const albums = images.reduce((acc, image: any) => {
+  const albums = images.reduce((acc: Map<string, any[]>, image: any) => {
     const key = image.eventName;
     if (!acc.has(key)) {
       acc.set(key, []);
     }
-    acc.get(key).push(image);
+    const albumImages = acc.get(key);
+    if (albumImages) {
+      albumImages.push(image);
+    }
     return acc;
   }, new Map());
 
@@ -77,7 +80,7 @@ export default async function GalleryPage() {
       <section className="container mx-auto px-6 py-20">
         {albums.size > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Array.from(albums.entries()).map(([eventName, images]) => (
+            {Array.from(albums.entries()).map(([eventName, images]: [string, any[]]) => (
               <AlbumCard
                 key={eventName}
                 eventName={eventName}
