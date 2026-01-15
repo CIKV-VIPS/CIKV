@@ -51,7 +51,7 @@ export async function safeGetAllBlogs() {
       orderBy: { createdAt: 'desc' },
     });
 
-    return blogs || [];
+    return Array.isArray(blogs) ? blogs : [];
   } catch (error) {
     console.error('Failed to fetch blogs:', {
       message: error instanceof Error ? error.message : String(error),
@@ -94,7 +94,7 @@ export async function safeGetAllEvents() {
       orderBy: { date: 'desc' },
     });
 
-    return events || [];
+    return Array.isArray(events) ? events : [];
   } catch (error) {
     console.error('Failed to fetch events:', {
       message: error instanceof Error ? error.message : String(error),
@@ -137,7 +137,7 @@ export async function safeGetAllGalleries() {
       orderBy: { uploadedAt: 'desc' },
     });
 
-    return galleries || [];
+    return Array.isArray(galleries) ? galleries : [];
   } catch (error) {
     console.error('Failed to fetch galleries:', {
       message: error instanceof Error ? error.message : String(error),

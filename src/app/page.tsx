@@ -50,7 +50,7 @@ export default async function LandingPage() {
             Upcoming Events
           </h3>
           <div className="grid gap-8 md:grid-cols-3">
-            {upcomingEvents.length > 0 ? (
+            {upcomingEvents && upcomingEvents.length > 0 ? (
               upcomingEvents.map(event => (
                 <div key={event.id} className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
                     <SafeImage
