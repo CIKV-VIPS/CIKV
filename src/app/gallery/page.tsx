@@ -72,6 +72,7 @@ async function getAlbums() {
 
 export default async function GalleryPage() {
   const albums = await getAlbums();
+  const albumEntries = Array.from(albums.entries());
 
   return (
     <main className="bg-[#FFFBEB]">
@@ -80,7 +81,7 @@ export default async function GalleryPage() {
       <section className="container mx-auto px-6 py-20">
         {albums.size > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Array.from(albums.entries()).map(([eventName, images]: [string, any[]]) => (
+            {albumEntries.map(([eventName, images]: any) => (
               <AlbumCard
                 key={eventName}
                 eventName={eventName}
