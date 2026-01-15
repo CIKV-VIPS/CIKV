@@ -57,13 +57,20 @@ export default function FormPanel() {
   const fetchForms = () => {
     setIsLoading(true);
     fetch('/api/forms')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`API error: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
-        setForms(data);
+        setForms(Array.isArray(data) ? data : []);
         setIsLoading(false);
       })
       .catch(err => {
+        console.error('Fetch error:', err);
         setError('Failed to fetch forms.');
+        setForms([]);
         setIsLoading(false);
       });
   };

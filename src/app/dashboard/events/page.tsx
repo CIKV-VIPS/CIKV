@@ -75,13 +75,20 @@ export default function EventPanel() {
   const fetchEvents = () => {
     setIsLoading(true);
     fetch('/api/events')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`API error: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
-        setEvents(data);
+        setEvents(Array.isArray(data) ? data : []);
         setIsLoading(false);
       })
       .catch(err => {
+        console.error('Fetch error:', err);
         setError('Failed to fetch events.');
+        setEvents([]);
         setIsLoading(false);
       });
   };
