@@ -2,31 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Link from 'next/link';
 import SafeImage from '@/components/SafeImage';
-import prisma from '@/lib/prisma';
-
-async function getUpcomingEvents() {
-  try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const events = await prisma.event.findMany({
-      where: {
-        date: {
-          gte: today,
-        },
-      },
-      orderBy: {
-        date: 'asc',
-      },
-      take: 3,
-    });
-
-    return events;
-  } catch (error) {
-    console.error('Error fetching events:', error);
-    return [];
-  }
-}
+import { safeGetUpcomingEvents } from '@/lib/safe-prisma';
 
 const getPlaceholderImage = (title: string) => {
   return `https://placehold.co/600x400/6D2828/FFFBEB?text=${encodeURIComponent(title)}`;
@@ -40,7 +16,7 @@ const isValidImageSrc = (src?: string | null) => {
 };
 
 export default async function LandingPage() {
-  const upcomingEvents = await getUpcomingEvents();
+  const upcomingEvents = await safeGetUpcomingEvents();
 
   return (
     <main className="bg-[#FFFBEB]">

@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import prisma from '@/lib/prisma';
+import { safeGetAllBlogs } from '@/lib/safe-prisma';
 import Link from 'next/link';
 import SafeImage from '@/components/SafeImage';
 
@@ -72,11 +72,7 @@ const BlogCard = ({ blog }: { blog: any }) => {
 };
 
 async function getBlogs() {
-  const blogs = await prisma.blog.findMany({
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+  const blogs = await safeGetAllBlogs();
   return blogs;
 }
 

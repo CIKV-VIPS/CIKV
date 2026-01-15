@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma';
+import { safeGetEventById } from '@/lib/safe-prisma';
 import SafeImage from '@/components/SafeImage';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
@@ -17,9 +17,7 @@ const formatDate = (dateString: string) => {
 };
 
 async function getEvent(id: string) {
-  const event = await prisma.event.findUnique({
-    where: { id: parseInt(id, 10) },
-  });
+  const event = await safeGetEventById(id);
   return event;
 }
 

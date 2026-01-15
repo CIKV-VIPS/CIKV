@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import prisma from '@/lib/prisma';
+import { safeGetAllGalleries } from '@/lib/safe-prisma';
 import Link from 'next/link';
 import SafeImage from '@/components/SafeImage';
 
@@ -53,13 +53,9 @@ const AlbumCard = ({ eventName, images }: { eventName: string; images: any[] }) 
 };
 
 async function getAlbums() {
-  const images = await prisma.galleryImage.findMany({
-    orderBy: {
-      uploadedAt: 'desc',
-    },
-  });
+  const images = await safeGetAllGalleries();
 
-  const albums = images.reduce((acc, image) => {
+  const albums = images.reduce((acc, image: any) => {
     const key = image.eventName;
     if (!acc.has(key)) {
       acc.set(key, []);

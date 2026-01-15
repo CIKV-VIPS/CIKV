@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma';
+import { safeGetBlogById } from '@/lib/safe-prisma';
 import SafeImage from '@/components/SafeImage';
 import Link from 'next/link';
 import { HiArrowLeft } from 'react-icons/hi';
@@ -17,9 +17,7 @@ const formatDate = (dateString: string) => {
 };
 
 async function getBlog(id: string) {
-  const blog = await prisma.blog.findUnique({
-    where: { id: parseInt(id, 10) },
-  });
+  const blog = await safeGetBlogById(id);
   return blog;
 }
 
