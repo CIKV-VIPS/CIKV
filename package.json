@@ -12,6 +12,7 @@
   "dependencies": {
     "@eslint/config-array": "^0.23.0",
     "@eslint/object-schema": "^3.0.0",
+    "@prisma/adapter-pg": "^6.19.2",
     "@prisma/client": "^6.19.2",
     "bcryptjs": "^2.4.3",
     "glob": "^13.0.0",
