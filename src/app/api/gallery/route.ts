@@ -5,6 +5,11 @@ import { revalidatePath } from 'next/cache';
 // GET all gallery images
 export async function GET() {
   try {
+    if (!process.env.DATABASE_URL) {
+      console.warn('DATABASE_URL not configured');
+      return NextResponse.json([], { status: 200 });
+    }
+
     const images = await prisma.galleryImage.findMany({
       orderBy: {
         uploadedAt: 'desc',
@@ -13,7 +18,7 @@ export async function GET() {
     return NextResponse.json(images);
   } catch (error) {
     console.error('Error fetching gallery images:', error);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+    return NextResponse.json([], { status: 200 });
   }
 }
 
