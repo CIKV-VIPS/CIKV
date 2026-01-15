@@ -133,8 +133,8 @@ export async function safeGetAllGalleries() {
       return [];
     }
 
-    const galleries = await prisma.gallery.findMany({
-      orderBy: { createdAt: 'desc' },
+    const galleries = await prisma.galleryImage.findMany({
+      orderBy: { uploadedAt: 'desc' },
     });
 
     return galleries || [];
