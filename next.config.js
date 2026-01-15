@@ -24,6 +24,19 @@ const nextConfig = {
       },
     ],
   },
+  headers: async () => {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
   webpack: (config, { isServer }) => {
     // Ignore markdown and license files that are causing parsing errors
     config.module.rules.push({

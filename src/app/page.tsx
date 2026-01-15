@@ -5,22 +5,27 @@ import SafeImage from '@/components/SafeImage';
 import prisma from '@/lib/prisma';
 
 async function getUpcomingEvents() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-  const events = await prisma.event.findMany({
-    where: {
-      date: {
-        gte: today,
+    const events = await prisma.event.findMany({
+      where: {
+        date: {
+          gte: today,
+        },
       },
-    },
-    orderBy: {
-      date: 'asc',
-    },
-    take: 3,
-  });
+      orderBy: {
+        date: 'asc',
+      },
+      take: 3,
+    });
 
-  return events;
+    return events;
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    return [];
+  }
 }
 
 const getPlaceholderImage = (title: string) => {
