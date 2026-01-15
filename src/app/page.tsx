@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from 'next/link';
 import SafeImage from '@/components/SafeImage';
 import prisma from '@/lib/prisma';
