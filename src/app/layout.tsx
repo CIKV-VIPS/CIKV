@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "CIKV",
   description: "CIKV Website",
   icons: {
-    icon: '/favicon.ico',
+    icon: '/assets/cikv_logo.jpeg',
   },
 };
 
@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/assets/cikv_logo.jpeg" sizes="any" />
       </head>
       <body className={`${inter.className} flex flex-col min-h-screen bg-[#FFFBEB]`}>
         <Header />

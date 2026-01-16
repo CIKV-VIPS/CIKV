@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
+// Disable caching for fresh data
+export const revalidate = 0;
+
 // GET a single blog by ID
 export async function GET(
   request: NextRequest,
@@ -22,7 +25,11 @@ export async function GET(
       return NextResponse.json({ message: "Blog not found" }, { status: 404 });
     }
 
-    return NextResponse.json(blog);
+    return NextResponse.json(blog, {
+      headers: {
+        'Cache-Control': 'no-store, max-age=0, must-revalidate',
+      }
+    });
   } catch (error) {
     console.error(`Error fetching blog ${id}:`, error);
     const errorMessage =
@@ -71,6 +78,7 @@ export async function PUT(
         },
       });
 
+      revalidatePath("/");
       revalidatePath("/blogs");
       revalidatePath(`/blogs/${id}`);
 
@@ -114,6 +122,7 @@ export async function DELETE(
         where: { id },
       });
 
+      revalidatePath("/");
       revalidatePath("/blogs");
 
       return NextResponse.json(

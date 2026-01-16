@@ -2,24 +2,47 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
+// Disable caching for fresh data
+export const revalidate = 0;
+
 // GET all forms
 export async function GET() {
   try {
     if (!process.env.DATABASE_URL) {
       console.error('DATABASE_URL not configured');
-      return NextResponse.json([], { status: 200 });
+      return NextResponse.json([], { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-store, max-age=0, must-revalidate',
+        }
+      });
     }
 
     try {
       const forms = await prisma.form.findMany();
-      return NextResponse.json(forms || [], { status: 200 });
+      return NextResponse.json(forms || [], { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-store, max-age=0, must-revalidate',
+        }
+      });
     } catch (dbError) {
       console.error('Database error fetching forms:', dbError);
-      return NextResponse.json([], { status: 200 });
+      return NextResponse.json([], { 
+        status: 200,
+        headers: {
+          'Cache-Control': 'no-store, max-age=0, must-revalidate',
+        }
+      });
     }
   } catch (error) {
     console.error('Error in forms GET:', error);
-    return NextResponse.json([], { status: 200 });
+    return NextResponse.json([], { 
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store, max-age=0, must-revalidate',
+      }
+    });
   }
 }
 
@@ -51,6 +74,7 @@ export async function POST(request: Request) {
         },
       });
 
+      revalidatePath('/');
       revalidatePath('/forms');
 
       return NextResponse.json(

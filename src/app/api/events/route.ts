@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
+// Disable caching for fresh data
+export const revalidate = 0;
+
 // GET all events
 export async function GET() {
   try {
@@ -10,7 +13,12 @@ export async function GET() {
         date: 'desc',
       },
     });
-    return NextResponse.json(events, { status: 200 });
+    return NextResponse.json(events, { 
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store, max-age=0, must-revalidate',
+      }
+    });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     console.error('Error in events GET:', error);
@@ -51,6 +59,7 @@ export async function POST(request: Request) {
         },
       });
 
+      revalidatePath('/');
       revalidatePath('/events');
 
       return NextResponse.json(

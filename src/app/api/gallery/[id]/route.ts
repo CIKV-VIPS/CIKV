@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
+// Disable caching for fresh data
+export const revalidate = 0;
+
 // UPDATE a gallery image by ID
 export async function PUT(request: NextRequest, context: any) {
   const { id } = context.params;
@@ -21,6 +24,7 @@ export async function PUT(request: NextRequest, context: any) {
         },
       });
 
+      revalidatePath('/');
       revalidatePath('/gallery');
       if (eventName) {
         revalidatePath(`/gallery/${eventName}`);
@@ -54,6 +58,7 @@ export async function DELETE(request: NextRequest, context: any) {
         where: { id: parseInt(id, 10) },
       });
 
+      revalidatePath('/');
       revalidatePath('/gallery');
       if (image && image.eventName) {
           revalidatePath(`/gallery/${image.eventName}`);

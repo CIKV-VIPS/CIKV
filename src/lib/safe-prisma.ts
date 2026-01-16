@@ -3,6 +3,7 @@ import prisma from './prisma';
 /**
  * Safe wrapper around Prisma queries that returns empty array on error
  * Prevents server component errors from crashing the page
+ * All data is fetched fresh - no caching
  */
 export async function safeGetUpcomingEvents() {
   try {

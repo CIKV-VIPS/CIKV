@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
+// Disable caching for fresh data
+export const revalidate = 0;
+
 // GET a single event by ID
 export async function GET(request: NextRequest, context: any) {
   const { id } = context.params;
@@ -14,7 +17,11 @@ export async function GET(request: NextRequest, context: any) {
       return NextResponse.json({ message: 'Event not found' }, { status: 404 });
     }
 
-    return NextResponse.json(event);
+    return NextResponse.json(event, {
+      headers: {
+        'Cache-Control': 'no-store, max-age=0, must-revalidate',
+      }
+    });
   } catch (error) {
     console.error(`Error fetching event ${id}:`, error);
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
@@ -46,6 +53,7 @@ export async function PUT(request: NextRequest, context: any) {
         },
       });
 
+      revalidatePath('/');
       revalidatePath('/events');
       revalidatePath(`/events/${id}`);
 
@@ -85,6 +93,7 @@ export async function DELETE(request: NextRequest, context: any) {
         where: { id: parseInt(id, 10) },
       });
 
+      revalidatePath('/');
       revalidatePath('/events');
       revalidatePath(`/events/${id}`);
 
