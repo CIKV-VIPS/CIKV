@@ -5,25 +5,19 @@ import { revalidatePath } from 'next/cache';
 // GET all blogs
 export async function GET() {
   try {
-    if (!process.env.DATABASE_URL) {
-      console.warn('DATABASE_URL not configured');
-      return NextResponse.json([], { status: 200 });
-    }
-
-    try {
-      const blogs = await prisma.blog.findMany({
-        orderBy: {
-          createdAt: 'desc',
-        },
-      });
-      return NextResponse.json(blogs || [], { status: 200 });
-    } catch (dbError) {
-      console.error('Database error fetching blogs:', dbError);
-      return NextResponse.json([], { status: 200 });
-    }
+    const blogs = await prisma.blog.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return NextResponse.json(blogs, { status: 200 });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     console.error('Error in blogs GET:', error);
-    return NextResponse.json([], { status: 200 });
+    return NextResponse.json(
+      { message: 'Internal server error', error: errorMessage },
+      { status: 500 }
+    );
   }
 }
 
