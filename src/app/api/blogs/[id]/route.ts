@@ -53,6 +53,14 @@ export async function PUT(
     try {
       const { title, author, content, imageUrl } = await request.json();
 
+      const existingBlog = await prisma.blog.findUnique({
+        where: { id },
+      });
+
+      if (!existingBlog) {
+        return NextResponse.json({ message: "Blog not found" }, { status: 404 });
+      }
+
       const blog = await prisma.blog.update({
         where: { id },
         data: {
@@ -94,6 +102,14 @@ export async function DELETE(
     }
 
     try {
+      const existingBlog = await prisma.blog.findUnique({
+        where: { id },
+      });
+
+      if (!existingBlog) {
+        return NextResponse.json({ message: "Blog not found" }, { status: 404 });
+      }
+
       await prisma.blog.delete({
         where: { id },
       });
