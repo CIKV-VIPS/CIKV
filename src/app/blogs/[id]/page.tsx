@@ -1,3 +1,7 @@
+// Force dynamic rendering - no static caching
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
+
 import { safeGetBlogById } from '@/lib/safe-prisma';
 import SafeImage from '@/components/SafeImage';
 import Link from 'next/link';

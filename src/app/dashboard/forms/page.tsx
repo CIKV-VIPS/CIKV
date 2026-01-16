@@ -1,5 +1,9 @@
 "use client";
 
+// Force dynamic rendering - no static caching
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect } from 'react';
 import { HiPlus, HiPencil, HiTrash, HiX } from 'react-icons/hi';
 import Cookies from 'js-cookie';

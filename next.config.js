@@ -27,11 +27,20 @@ const nextConfig = {
   headers: async () => {
     return [
       {
+        source: '/api/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, max-age=0, must-revalidate',
+          },
+        ],
+      },
+      {
         source: '/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: 'public, max-age=0, must-revalidate',
           },
         ],
       },

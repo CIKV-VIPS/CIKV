@@ -6,11 +6,15 @@ import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
+// Force dynamic rendering - no static caching
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "CIKV",
   description: "CIKV Website",
   icons: {
-    icon: '/assets/cikv_logo.jpeg',
+    icon: 'https://res.cloudinary.com/dx2ttgkba/image/upload/v1768559225/cikv_logo_ngjrst.jpg',
   },
 };
 
@@ -27,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/assets/cikv_logo.jpeg" sizes="any" />
+        <link rel="icon" href="https://res.cloudinary.com/dx2ttgkba/image/upload/v1768559225/cikv_logo_ngjrst.jpg" sizes="any" />
       </head>
       <body className={`${inter.className} flex flex-col min-h-screen bg-[#FFFBEB]`}>
         <Header />
