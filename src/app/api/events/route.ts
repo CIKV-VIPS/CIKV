@@ -15,7 +15,7 @@ export async function GET() {
 
     const events = await prisma.event.findMany({
       orderBy: {
-        date: 'desc',
+        createdAt: 'desc',
       },
     });
     return NextResponse.json(events, { status: 200 });

@@ -3,6 +3,44 @@
 import { useState, useEffect } from 'react';
 import { HiPlus, HiPencil, HiTrash, HiX } from 'react-icons/hi';
 
+// --- Reusable Helper Functions ---
+
+async function apiRequest(url: string, method: string, body?: any) {
+  const options: RequestInit = {
+    method,
+    headers: {},
+  };
+
+  if (body) {
+    options.headers = { 'Content-Type': 'application/json' };
+    options.body = JSON.stringify(body);
+  }
+
+  // Log the request details for debugging
+  console.log('Submitting request:');
+  console.log('URL:', url);
+  console.log('Method:', method);
+  if (body) {
+    console.log('Body:', options.body);
+  }
+
+  const res = await fetch(url, options);
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({ message: `An unknown error occurred. Status: ${res.status}` }));
+    throw new Error(errorData.message || `API error: ${res.status}`);
+  }
+
+  // For DELETE requests, the response might not have a body
+  if (method === 'DELETE') {
+    return;
+  }
+  
+  return res.json();
+}
+
+// --- UI Components ---
+
 const LoadingSpinner = () => (
   <div className="w-6 h-6 border-2 border-amber-800 border-t-transparent rounded-full animate-spin"></div>
 );
@@ -55,6 +93,8 @@ const FormModal = ({ title, children, onClose }: { title: string; children: Reac
   </div>
 );
 
+// --- Main Component ---
+
 const initialBlogState = {
   title: '',
   author: '',
@@ -67,22 +107,20 @@ export default function BlogPanel() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [currentBlog, setCurrentBlog] = useState(initialBlogState);
+  const [currentBlog, setCurrentBlog] = useState<any>(initialBlogState);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
 
-  const fetchBlogs = () => {
+  const fetchBlogs = async () => {
     setIsLoading(true);
-    fetch('/api/blogs')
-      .then(res => res.json())
-      .then(data => {
-        setBlogs(data);
-        setIsLoading(false);
-      })
-      .catch(err => {
-        setError('Failed to fetch blogs.');
-        setIsLoading(false);
-      });
+    try {
+      const data = await apiRequest('/api/blogs', 'GET');
+      setBlogs(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch blogs.');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   useEffect(() => {
@@ -102,46 +140,36 @@ export default function BlogPanel() {
     setShowForm(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const url = isEditMode ? `/api/blogs/${editingId}` : '/api/blogs';
     const method = isEditMode ? 'PUT' : 'POST';
+    
+    // Ensure a clean data object is sent
+    const { title, author, content, imageUrl } = currentBlog;
+    const blogData = { title, author, content, imageUrl };
 
-    fetch(url, {
-      method: method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(currentBlog),
-    })
-    .then(res => {
-      if (!res.ok) throw new Error(`API error: ${res.status}`);
-      return res.json();
-    })
-    .then(() => {
+    try {
+      await apiRequest(url, method, blogData);
       setShowForm(false);
       setError(null);
       fetchBlogs();
-    })
-    .catch(err => {
+    } catch (err: any) {
       console.error('Error:', err);
       setError(err.message || 'Failed to save blog');
-    });
+    }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this blog post?')) {
-      fetch(`/api/blogs/${id}`, { method: 'DELETE' })
-        .then(res => {
-          if (!res.ok) throw new Error(`API error: ${res.status}`);
-          return res.json();
-        })
-        .then(() => {
-          setError(null);
-          fetchBlogs();
-        })
-        .catch(err => {
-          console.error('Error:', err);
-          setError(err.message || 'Failed to delete blog');
-        });
+      try {
+        await apiRequest(`/api/blogs/${id}`, 'DELETE');
+        setError(null);
+        fetchBlogs();
+      } catch (err: any) {
+        console.error('Error:', err);
+        setError(err.message || 'Failed to delete blog');
+      }
     }
   };
 
@@ -165,7 +193,7 @@ export default function BlogPanel() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <FormInput label="Title" id="title" value={currentBlog.title} onChange={(e) => setCurrentBlog({...currentBlog, title: e.target.value})} />
             <FormInput label="Author" id="author" value={currentBlog.author} onChange={(e) => setCurrentBlog({...currentBlog, author: e.target.value})} />
-            <FormInput label="Image URL" id="imageUrl" value={currentBlog.imageUrl} onChange={(e) => setCurrentBlog({...currentBlog, imageUrl: e.target.value})} required={false} />
+            <FormInput label="Image URL" id="imageUrl" value={currentBlog.imageUrl || ''} onChange={(e) => setCurrentBlog({...currentBlog, imageUrl: e.target.value})} required={false} />
             <FormTextarea label="Content" id="content" value={currentBlog.content} onChange={(e) => setCurrentBlog({...currentBlog, content: e.target.value})} />
             <button type="submit" className="bg-amber-600 text-white px-6 py-2 rounded-lg shadow-md hover:bg-amber-700 font-semibold">
               {isEditMode ? 'Save Changes' : 'Create Post'}
