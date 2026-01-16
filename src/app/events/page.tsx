@@ -92,7 +92,14 @@ export default function EventsPage() {
 
   useEffect(() => {
     fetch('/api/events')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          return res.json().then(errorData => {
+            throw new Error(errorData.message || 'Failed to fetch events');
+          });
+        }
+        return res.json();
+      })
       .then(data => {
         setEvents(data);
         setIsLoading(false);
