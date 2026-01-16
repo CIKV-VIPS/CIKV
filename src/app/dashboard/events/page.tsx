@@ -142,6 +142,8 @@ export default function EventPanel() {
     })
     .then(() => {
       setShowForm(false);
+      setError(null);
+      setCurrentEvent(initialEventState);
       fetchEvents();
     })
     .catch(err => {
@@ -164,6 +166,7 @@ export default function EventPanel() {
           return res.json();
         })
         .then(() => {
+          setError(null);
           fetchEvents();
         })
         .catch(err => {

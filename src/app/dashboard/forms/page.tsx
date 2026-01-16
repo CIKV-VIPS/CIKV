@@ -114,6 +114,7 @@ export default function FormPanel() {
     })
     .then(() => {
       setShowForm(false);
+      setError(null);
       fetchForms();
     })
     .catch(err => setError(err.message));
@@ -135,6 +136,7 @@ export default function FormPanel() {
           return res.json();
         })
         .then(() => {
+          setError(null);
           fetchForms();
         })
         .catch(err => setError(err.message));
