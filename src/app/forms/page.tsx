@@ -1,9 +1,5 @@
 "use client";
 
-// Force dynamic rendering - no static caching
-export const revalidate = 0;
-export const dynamic = "force-dynamic";
-
 import { useState, useEffect } from 'react';
 
 export default function Forms() {
@@ -16,8 +12,17 @@ export default function Forms() {
     const fetchForms = () => {
       setIsLoading(true);
       fetch('/api/forms')
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`API error: ${res.status}`);
+          }
+          return res.json();
+        })
         .then(data => {
+          // Ensure data is an array
+          if (!Array.isArray(data)) {
+            throw new Error('Invalid data format from API');
+          }
           const active = data.filter((form: any) => form.status === 'active');
           const inactive = data.filter((form: any) => form.status === 'inactive');
           setActiveForms(active);
@@ -25,7 +30,8 @@ export default function Forms() {
           setIsLoading(false);
         })
         .catch(err => {
-          setError('Failed to fetch forms.');
+          console.error('Form fetch error:', err);
+          setError(err.message || 'Failed to fetch forms.');
           setIsLoading(false);
         });
     };

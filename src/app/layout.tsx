@@ -7,7 +7,6 @@ import Footer from "@/components/Footer";
 const inter = Inter({ subsets: ["latin"] });
 
 // Force dynamic rendering - no static caching
-export const revalidate = 0;
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {

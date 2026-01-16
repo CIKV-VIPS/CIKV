@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Minimal turbopack config to avoid Turbopack vs webpack conflict
-  turbopack: {},
-  // New way to externalize packages
-  serverExternalPackages: [],
   experimental: {
     outputFileTracingIncludes: {
       '/api/**/*': ['./node_modules/.prisma/client/**/*'],

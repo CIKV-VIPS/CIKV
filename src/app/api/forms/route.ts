@@ -19,7 +19,15 @@ export async function GET() {
     }
 
     try {
-      const forms = await prisma.form.findMany();
+      // Add timeout to prevent hanging requests
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Database query timeout')), 5000)
+      );
+      
+      const queryPromise = prisma.form.findMany();
+      
+      const forms = await Promise.race([queryPromise, timeoutPromise]);
+      
       return NextResponse.json(forms || [], { 
         status: 200,
         headers: {
