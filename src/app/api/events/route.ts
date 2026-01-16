@@ -6,26 +6,24 @@ import { revalidatePath } from 'next/cache';
 export async function GET() {
   try {
     if (!process.env.DATABASE_URL) {
-      console.error('DATABASE_URL not configured');
-      return NextResponse.json(
-        { message: 'Database not configured' },
-        { status: 500 }
-      );
+      console.warn('DATABASE_URL not configured');
+      return NextResponse.json([], { status: 200 });
     }
 
-    const events = await prisma.event.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-    return NextResponse.json(events, { status: 200 });
+    try {
+      const events = await prisma.event.findMany({
+        orderBy: {
+          date: 'desc',
+        },
+      });
+      return NextResponse.json(events || [], { status: 200 });
+    } catch (dbError) {
+      console.error('Database error fetching events:', dbError);
+      return NextResponse.json([], { status: 200 });
+    }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     console.error('Error in events GET:', error);
-    return NextResponse.json(
-      { message: 'Internal server error', error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json([], { status: 200 });
   }
 }
 
