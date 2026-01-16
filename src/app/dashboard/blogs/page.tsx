@@ -8,11 +8,19 @@ import { HiPlus, HiPencil, HiTrash, HiX } from 'react-icons/hi';
 async function apiRequest(url: string, method: string, body?: any) {
   const options: RequestInit = {
     method,
-    headers: {},
+    headers: { 'Content-Type': 'application/json' },
   };
 
+  // Get the token from cookies
+  const token = typeof window !== 'undefined' ? getCookie('accessToken') : null;
+  if (token) {
+    options.headers = {
+      ...options.headers,
+      'Authorization': `Bearer ${token}`,
+    };
+  }
+
   if (body) {
-    options.headers = { 'Content-Type': 'application/json' };
     options.body = JSON.stringify(body);
   }
 
@@ -37,6 +45,15 @@ async function apiRequest(url: string, method: string, body?: any) {
   }
   
   return res.json();
+}
+
+// Helper function to get cookie value
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
 }
 
 // --- UI Components ---

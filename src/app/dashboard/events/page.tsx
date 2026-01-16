@@ -24,6 +24,15 @@ const FormInput = ({ label, id, value, onChange, type = 'text', required = true 
   </div>
 );
 
+// Helper function to get cookie value
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+}
+
 const FormTextarea = ({ label, id, value, onChange, required = true }: { label: string; id: string; value: string; onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void; required?: boolean; }) => (
   <div>
     <label htmlFor={id} className="block text-sm font-semibold text-gray-700 mb-1">
@@ -115,10 +124,14 @@ export default function EventPanel() {
     e.preventDefault();
     const url = isEditMode ? `/api/events/${editingId}` : '/api/events';
     const method = isEditMode ? 'PUT' : 'POST';
+    const token = getCookie('accessToken');
 
     fetch(url, {
       method: method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      },
       body: JSON.stringify(currentEvent),
     })
     .then(res => {
@@ -139,7 +152,11 @@ export default function EventPanel() {
 
   const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this event?')) {
-      fetch(`/api/events/${id}`, { method: 'DELETE' })
+      const token = getCookie('accessToken');
+      fetch(`/api/events/${id}`, { 
+        method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      })
         .then(res => {
           if (!res.ok) {
             throw new Error(`API error: ${res.status}`);

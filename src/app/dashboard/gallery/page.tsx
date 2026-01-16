@@ -25,6 +25,15 @@ const FormInput = ({ label, id, value, onChange, type = 'text', required = true 
   </div>
 );
 
+// Helper function to get cookie value
+function getCookie(name: string): string | null {
+  if (typeof document === 'undefined') return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+  return null;
+}
+
 const FormModal = ({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void; }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -76,9 +85,13 @@ export default function GalleryPanel() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const token = getCookie('accessToken');
     fetch('/api/gallery', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      },
       body: JSON.stringify(currentImage),
     })
     .then(res => {
@@ -98,7 +111,11 @@ export default function GalleryPanel() {
 
   const handleDelete = (id: number) => {
     if (window.confirm('Are you sure you want to delete this image?')) {
-      fetch(`/api/gallery/${id}`, { method: 'DELETE' })
+      const token = getCookie('accessToken');
+      fetch(`/api/gallery/${id}`, { 
+        method: 'DELETE',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      })
         .then(res => {
           if (!res.ok) throw new Error(`API error: ${res.status}`);
           return res.json();
